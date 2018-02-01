@@ -123,13 +123,7 @@ public class DetailActivity extends AppCompatActivity {
         Intent i = new Intent(DetailActivity.this,GraphActivity.class);
         Log.d("Detail Activity","Array size : " + data.size());
         Bundle b = new Bundle();
-        ArrayList<StockValues> allData = new ArrayList<>();
-        int size = data.size();
-        for(int j=0;j<(2*size/3);j++)
-        {
-            allData.add(data.get(j));
-        }
-        b.putSerializable(INTENT_EXTRA_VALUE,allData);
+        b.putSerializable(INTENT_EXTRA_VALUE,data);
         i.putExtra(INTENT_BUNDLE,b);
         startActivity(i);
     }

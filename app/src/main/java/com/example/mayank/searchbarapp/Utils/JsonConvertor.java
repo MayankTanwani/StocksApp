@@ -25,7 +25,7 @@ public class JsonConvertor {
         JSONObject closeData = jsonData.getJSONObject(CLOSE_CODE);
         JSONObject dateData = jsonData.getJSONObject(DATE_CODE);
         ArrayList<StockValues> values = new ArrayList<>();
-        for(int i=0;i<TOTAL_VALUES;i++)
+        for(int i=0;true;i++)
         {
             if(closeData.has("" + i))
             {
