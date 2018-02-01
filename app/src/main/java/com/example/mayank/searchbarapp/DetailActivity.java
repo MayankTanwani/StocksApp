@@ -1,5 +1,6 @@
 package com.example.mayank.searchbarapp;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -29,13 +30,14 @@ public class DetailActivity extends AppCompatActivity {
     ArrayList<StockValues> data;
     RecyclerView recyclerView;
     StocksAdapter adapter;
-    ProgressBar progressBar;
+    ProgressDialog progressDialog;
     public SQLiteDatabase mDb;
     public StocksDbHelper mStocksDbHelper;
     public static final String INTENT_BUNDLE = "Bundle";
     Button showGraph;
     Cursor mDetails;
     public static final String INTENT_EXTRA_VALUE = "data-arraylist";
+    String name =null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,7 +46,6 @@ public class DetailActivity extends AppCompatActivity {
         mDb = mStocksDbHelper.getWritableDatabase();
         twCountryName = (TextView)findViewById(R.id.countryName);
         Intent i = getIntent();
-        String name =null;
         showGraph = findViewById(R.id.showGraph);
         if(i.hasExtra(MainActivity.intentKey))
         {
@@ -53,9 +54,9 @@ public class DetailActivity extends AppCompatActivity {
             mDetails = getDetails(name);
         }
         data = new ArrayList<>();
-        progressBar = findViewById(R.id.loading_indicator);
         recyclerView = findViewById(R.id.stocks_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        progressDialog = new ProgressDialog(this);      //creating a progress dialog
         adapter = new StocksAdapter(data);
         recyclerView.setAdapter(adapter);
         String code = null;
@@ -75,14 +76,15 @@ public class DetailActivity extends AppCompatActivity {
             super.onPostExecute(aVoid);
             adapter.swapArray(data);
             showGraph.setVisibility(View.VISIBLE);
-            progressBar.setVisibility(View.INVISIBLE);
+            progressDialog.dismiss();                   //removal of the progress dialog
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             showGraph.setVisibility(View.INVISIBLE);
-            progressBar.setVisibility(View.VISIBLE);
+            progressDialog.setMessage("Updating\n"+name);      //display a progress dialog
+            progressDialog.show();
         }
 
         @Override
