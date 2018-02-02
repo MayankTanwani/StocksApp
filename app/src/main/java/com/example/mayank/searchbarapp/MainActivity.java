@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -38,6 +39,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerAdapter.L
     public Cursor mCursor;
     ProgressBar progressBar;
     SearchView searchView;
+    public Menu mMenu;
+    public FloatingActionButton mFAB;
     public static String intentKey = "stock-name";
     public static final String COUNTRY_DATA = "country.txt";
     public static final String BSE_DATA = "BSE-datasets-codes.csv";
@@ -47,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerAdapter.L
         setContentView(R.layout.activity_main);
         mStocksDbHelper = new StocksDbHelper(this);
         mDb = mStocksDbHelper.getWritableDatabase();
-
+        mFAB = findViewById(R.id.fab);
         recyclerView = (RecyclerView)findViewById(R.id.recyler_view);
         progressBar = (ProgressBar)findViewById(R.id.pb_loading_indicator);
 
@@ -57,12 +60,19 @@ public class MainActivity extends AppCompatActivity implements RecyclerAdapter.L
         adapter = new RecyclerAdapter(mCursor,this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
+        mFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mMenu.performIdentifierAction(R.id.search,0);
+            }
+        });
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.search_menu,menu);
+        mMenu = menu;
         searchView =(SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setOnQueryTextListener(this);
         return true;

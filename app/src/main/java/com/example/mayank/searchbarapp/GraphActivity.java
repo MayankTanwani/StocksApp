@@ -86,6 +86,7 @@ public class GraphActivity extends AppCompatActivity {
         graph.getViewport().setXAxisBoundsManual(true);
 
         graph.getViewport().setScrollable(true);
+//        graph.getViewport().setScalable(true);
 
         // as we use dates as labels, the human rounding to nice readable numbers
         // is not necessary
