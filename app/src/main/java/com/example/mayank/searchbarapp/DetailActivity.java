@@ -1,10 +1,14 @@
 package com.example.mayank.searchbarapp;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -24,7 +28,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class DetailActivity extends AppCompatActivity {
+public class DetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Void> {
 
     TextView twCountryName;
     ArrayList<StockValues> data;
@@ -34,9 +38,11 @@ public class DetailActivity extends AppCompatActivity {
     public SQLiteDatabase mDb;
     public StocksDbHelper mStocksDbHelper;
     public static final String INTENT_BUNDLE = "Bundle";
+    public static final String INTENT_EXTRA_VALUE = "data-arraylist";
+    public static final int LOADER_ID = 23;
+
     Button showGraph;
     Cursor mDetails;
-    public static final String INTENT_EXTRA_VALUE = "data-arraylist";
     String name =null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,44 +71,69 @@ public class DetailActivity extends AppCompatActivity {
             mDetails.moveToFirst();
             code = mDetails.getString(mDetails.getColumnIndex(DatabaseContract.DatabaseEntry.STOCK_CODE));
         }
-        URL apiURL = NetworkUtils.buildURL(this,code);
-        (new DownloadTask()).execute(apiURL);
+        downloadStockData(code);
     }
 
-    public class DownloadTask extends AsyncTask<URL,Void,Void>
+    public void downloadStockData(String code)
     {
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            adapter.swapArray(data);
-            showGraph.setVisibility(View.VISIBLE);
-            progressDialog.dismiss();                   //removal of the progress dialog
+
+        Bundle stockCodeBundle = new Bundle();
+        stockCodeBundle.putString("stock-code",code);
+        LoaderManager loaderManager = getSupportLoaderManager();
+        Loader<Void> getStockDetailLoader = loaderManager.getLoader(LOADER_ID);
+        if(getStockDetailLoader == null) {
+            loaderManager.initLoader(LOADER_ID,stockCodeBundle,this);
+        }else {
+            loaderManager.restartLoader(LOADER_ID,stockCodeBundle,this);
         }
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            showGraph.setVisibility(View.INVISIBLE);
-            progressDialog.setMessage("Updating\n"+name);      //display a progress dialog
-            progressDialog.show();
-        }
 
-        @Override
-        protected Void doInBackground(URL... urls) {
-           if(urls == null)
-               return null;
-           URL apiURL = urls[0];
-            String response = null;
-           try {
-               response = NetworkUtils.getResponseFromHttpUrl(apiURL);
-               data = JsonConvertor.convertDataFromJson(DetailActivity.this,response);
-           }catch (Exception e)
-           {
-               e.printStackTrace();
-           }
-            return null;
-        }
+        //(new DownloadTask()).execute(apiURL);
     }
+
+    @SuppressLint("StaticFieldLeak")
+    @Override
+    public Loader<Void> onCreateLoader(int id, final Bundle args) {
+        return new AsyncTaskLoader<Void>(this) {
+            @Override
+            protected void onStartLoading() {
+                if(args == null)
+                    return;
+                showGraph.setVisibility(View.INVISIBLE);
+                progressDialog.setMessage("Updating\n"+name);      //display a progress dialog
+                progressDialog.show();
+                forceLoad();
+            }
+
+            @Override
+            public Void loadInBackground() {
+                String code = args.getString("stock-code");
+                URL apiURL = NetworkUtils.buildURL(DetailActivity.this,code);
+                String response = null;
+                try {
+                    response = NetworkUtils.getResponseFromHttpUrl(apiURL);
+                    data = JsonConvertor.convertDataFromJson(DetailActivity.this,response);
+                }catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        };
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Void> loader, Void somedata) {
+        adapter.swapArray(data);
+        showGraph.setVisibility(View.VISIBLE);
+        progressDialog.dismiss();
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Void> loader) {
+
+    }
+
     public Cursor getDetails(String name)
     {
         String selection = DatabaseContract.DatabaseEntry.STOCK_NAME + " = '" + name + "' ";
