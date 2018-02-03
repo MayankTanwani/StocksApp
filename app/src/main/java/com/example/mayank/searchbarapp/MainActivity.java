@@ -1,5 +1,6 @@
 package com.example.mayank.searchbarapp;
 
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
@@ -37,8 +38,9 @@ public class MainActivity extends AppCompatActivity implements RecyclerAdapter.L
     public RecyclerAdapter adapter;
     public RecyclerView recyclerView;
     public Cursor mCursor;
-    ProgressBar progressBar;
     SearchView searchView;
+    ProgressDialog progressDialog;
+
     public Menu mMenu;
     public FloatingActionButton mFAB;
     public static String intentKey = "stock-name";
@@ -52,8 +54,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerAdapter.L
         mDb = mStocksDbHelper.getWritableDatabase();
         mFAB = findViewById(R.id.fab);
         recyclerView = (RecyclerView)findViewById(R.id.recyler_view);
-        progressBar = (ProgressBar)findViewById(R.id.pb_loading_indicator);
-
+        progressDialog = new ProgressDialog(this);
         data = new ArrayList<>();
         new storeDatabase().execute();
 
@@ -95,8 +96,9 @@ public class MainActivity extends AppCompatActivity implements RecyclerAdapter.L
 
         @Override
         protected void onPreExecute() {
+            progressDialog.setMessage("Loading Data...");
+            progressDialog.show();
             super.onPreExecute();
-            progressBar.setVisibility(View.VISIBLE);
         }
 
         @Override
@@ -118,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerAdapter.L
             super.onPostExecute(aVoid);
             mCursor = getAllStocks();
             adapter.swapCursor(mCursor);
-            progressBar.setVisibility(View.INVISIBLE);
+            progressDialog.dismiss();
         }
     }
 
