@@ -18,6 +18,7 @@ import com.jjoe64.graphview.series.Series;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 
 public class GraphActivity extends AppCompatActivity {
@@ -49,6 +50,8 @@ public class GraphActivity extends AppCompatActivity {
             Log.v("GraphViewActivity","Arraysize" + mData.size());
         else
             Log.v("GraphViewActivity","Arraylist empty null");
+        Collections.reverse(mData);
+        //mData = new ArrayList<>(mData.subList(0,10));
         makeGraph(mData);
     }
 
@@ -86,7 +89,7 @@ public class GraphActivity extends AppCompatActivity {
         graph.getViewport().setXAxisBoundsManual(true);
 
         graph.getViewport().setScrollable(true);
-//        graph.getViewport().setScalable(true);
+        graph.getViewport().setScalable(true);
 
         // as we use dates as labels, the human rounding to nice readable numbers
         // is not necessary
