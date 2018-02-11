@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class DetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Void> {
+public class DetailActivity extends AppCompatActivity {
 
     TextView twCountryName;
     ArrayList<StockValues> data;
@@ -71,68 +71,43 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
             mDetails.moveToFirst();
             code = mDetails.getString(mDetails.getColumnIndex(DatabaseContract.DatabaseEntry.STOCK_CODE));
         }
-        downloadStockData(code);
+
+        URL apiURL = NetworkUtils.buildURL(this,code);
+        (new DownloadTask()).execute(apiURL);
+
     }
 
-    public void downloadStockData(String code)
+    public class DownloadTask extends AsyncTask<URL,Void,Void>
     {
+                @Override
+                protected void onPostExecute(Void aVoid) {
+                        super.onPostExecute(aVoid);
+                        adapter.swapArray(data);
+                        showGraph.setVisibility(View.VISIBLE);
+                    }
 
-        Bundle stockCodeBundle = new Bundle();
-        stockCodeBundle.putString("stock-code",code);
-        LoaderManager loaderManager = getSupportLoaderManager();
-        Loader<Void> getStockDetailLoader = loaderManager.getLoader(LOADER_ID);
-        if(getStockDetailLoader == null) {
-            loaderManager.initLoader(LOADER_ID,stockCodeBundle,this);
-        }else {
-            loaderManager.restartLoader(LOADER_ID,stockCodeBundle,this);
-        }
+                        @Override
+                protected void onPreExecute() {
+                        super.onPreExecute();
+                        showGraph.setVisibility(View.INVISIBLE);
+                    }
 
-
-        //(new DownloadTask()).execute(apiURL);
-    }
-
-    @SuppressLint("StaticFieldLeak")
-    @Override
-    public Loader<Void> onCreateLoader(int id, final Bundle args) {
-        return new AsyncTaskLoader<Void>(this) {
-            @Override
-            protected void onStartLoading() {
-                if(args == null)
-                    return;
-                showGraph.setVisibility(View.INVISIBLE);
-                progressDialog.setMessage("Updating\n"+name);      //display a progress dialog
-                progressDialog.show();
-                forceLoad();
+                        @Override
+                protected Void doInBackground(URL... urls) {
+                       if(urls == null)
+                               return null;
+                       URL apiURL = urls[0];
+                        String response = null;
+                       try {
+                               response = NetworkUtils.getResponseFromHttpUrl(apiURL);
+                               data = JsonConvertor.convertDataFromJson(DetailActivity.this,response);
+                           }catch (Exception e)
+                       {
+                                   e.printStackTrace();
+                       }
+                        return null;
+                    }
             }
-
-            @Override
-            public Void loadInBackground() {
-                String code = args.getString("stock-code");
-                URL apiURL = NetworkUtils.buildURL(DetailActivity.this,code);
-                String response = null;
-                try {
-                    response = NetworkUtils.getResponseFromHttpUrl(apiURL);
-                    data = JsonConvertor.convertDataFromJson(DetailActivity.this,response);
-                }catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-                return null;
-            }
-        };
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Void> loader, Void somedata) {
-        adapter.swapArray(data);
-        showGraph.setVisibility(View.VISIBLE);
-        progressDialog.dismiss();
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Void> loader) {
-
-    }
 
     public Cursor getDetails(String name)
     {

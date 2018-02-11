@@ -7,30 +7,4 @@
     android:orientation="vertical"
     tools:context="com.example.mayank.searchbarapp.DetailActivity">
 
-    <TextView
-        android:id="@+id/countryName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:layout_gravity="center"
-        android:text="Hello" />
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="ShowGraph"
-        android:layout_gravity="center"
-        android:id="@+id/showGraph"
-        android:text="Show Graph"/>
-    <android.support.v7.widget.RecyclerView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:id="@+id/stocks_list">
-    </android.support.v7.widget.RecyclerView>
-    <ProgressBar
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:visibility="invisible"
-        android:id="@+id/loading_indicator"/>
 </LinearLayout>

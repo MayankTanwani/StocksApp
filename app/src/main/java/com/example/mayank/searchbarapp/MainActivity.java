@@ -17,9 +17,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.example.mayank.searchbarapp.Database.DatabaseContract;
 import com.example.mayank.searchbarapp.Database.StocksDbHelper;
+import com.example.mayank.searchbarapp.Fragments.DetailsFragment;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 
@@ -233,9 +235,13 @@ public class MainActivity extends AppCompatActivity implements RecyclerAdapter.L
 
     @Override
     public void onListItemClickListener(String name) {
-        Intent i = new Intent(MainActivity.this,DetailActivity.class);
-        i.putExtra(intentKey,name);
-        startActivity(i);
+//        Intent i = new Intent(MainActivity.this,DetailActivity.class);
+//        i.putExtra(intentKey,name);
+//        startActivity(i);
+
+        startActivity(new Intent(MainActivity.this, StockDetailsActivity.class));
+        DetailsFragment.NAME_KEY = name;
+
     }
 
     public Cursor getAllStocks()

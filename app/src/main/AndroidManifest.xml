@@ -19,8 +19,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".DetailActivity" />
-        <activity android:name=".GraphActivity"
-            android:screenOrientation="landscape"></activity>
+        <activity
+            android:name=".GraphActivity"
+            android:screenOrientation="landscape" />
+        <activity android:name=".StockDetailsActivity"></activity>
     </application>
 
 </manifest>
