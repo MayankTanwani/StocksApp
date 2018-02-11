@@ -8,6 +8,7 @@ import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.mayank.searchbarapp.Fragments.DetailsFragment;
 import com.example.mayank.searchbarapp.Utils.JsonConvertor;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
@@ -26,8 +27,7 @@ import java.util.Date;
 
 public class GraphActivity extends AppCompatActivity {
 
-    TextView xValue;
-    TextView yValue;
+
     ArrayList<StockValues> mData;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,21 +38,14 @@ public class GraphActivity extends AppCompatActivity {
         Bundle bundle= null;
         if(i.hasExtra(DetailActivity.INTENT_BUNDLE))
         {
-            bundle = i.getBundleExtra(DetailActivity.INTENT_BUNDLE);
+            bundle = i.getBundleExtra(DetailsFragment.INTENT_BUNDLE);
         }
 
         if(bundle!=null) {
             Log.v("GraphActivity","Arraylist received ");
-            mData = (ArrayList<StockValues>) bundle.getSerializable(DetailActivity.INTENT_EXTRA_VALUE);
+            mData = (ArrayList<StockValues>) bundle.getSerializable(DetailsFragment.INTENT_EXTRA_VALUE);
         }
-
-        if(mData!=null)
-            Log.v("GraphViewActivity","Arraysize" + mData.size());
-        else
-            Log.v("GraphViewActivity","Arraylist empty null");
         Collections.reverse(mData);
-        //mData = new ArrayList<>(mData.subList(0,10));
-//        makeGraph(mData);
         makeGraph();
     }
 
